@@ -91,9 +91,170 @@ for (contrast in ContrastsUsed) {
         )
       
       
-  ggsave(paste0(contrast,"_VolcanoPlot.jpeg"), volcanoPlot, width = 35, height = 9,dpi = 600)
+  ggsave(paste0("data/",contrast,"_VolcanoPlot.jpeg"), volcanoPlot, width = 35, height = 9,dpi = 600)
+  
+  
+  MAPlot <- allDEProteins %>%
+    ggplot(aes(x = AveExpr,
+               y = logFC,
+               colour = isSignificant)) +
+    geom_hline(yintercept = 0, linetype = "dotted") +
+    geom_point(size = 1, alpha = 0.5) +
+    scale_colour_manual(values = c("grey", "red")) +
+    geom_text(data = top10 ,aes(label = Protein),check_overlap = TRUE) +
+    ggtitle(paste0(contrast)) +
+    theme(plot.title = element_text(hjust = 0.5))
+  
+  ggsave(paste0("data/",contrast,"_MAPlot.jpeg"), MAPlot, width = 35, height = 9,dpi = 600)
+  
+  
+  if(contrast == "ZSF_O_Vs_ZSF_L"){
+    
+    requiredColumns <- grep("^zsf1_ob",colnames(measurements))
+    requiredColumns <- c(requiredColumns,grep("^ZSF1_Lean",colnames(measurements)))
+    requiredMeasurements <- measurements[,requiredColumns]
+    
+    sampleNames <- colnames(requiredMeasurements)
+    
+    zfs1_ob_SamplesCount <- length(grep(paste0("^", "zsf1_ob"), sampleNames))
+    zsf1_lean_SamplesCount <- length(grep(paste0("^", "ZSF1_Lean"), sampleNames))
+    
+    sampleGroups <- factor(c(rep("ZSF1_OB",zfs1_ob_SamplesCount),
+                             rep("ZSF1_LN",zsf1_lean_SamplesCount)
+    ))
+    
+    groupColors <- c("ZSF1_OB" = "blue",
+                     "ZSF1_LN" = "red")
+    
+    sigProteins <- allDEProteinsSig$Protein
+    
+    sigProteinIntensityData <- requiredMeasurements[rownames(requiredMeasurements) %in% sigProteins,]
+    
+    scaledSigExpData <- t(scale(t(sigProteinIntensityData)))
+    
+    topAnnotation <- HeatmapAnnotation(
+      Group = sampleGroups,
+      col = list(Group = groupColors)
+    )
+    
+    jpeg(paste0("data/",contrast,"_TopHeatMap.jpeg"), width = 1200, height = 1000,quality = 100)
+    
+    topHeatmap <- Heatmap(scaledSigExpData,
+                          name = "Expression",
+                          row_names_side = "left",
+                          column_names_side = "top",
+                          clustering_distance_rows = "euclidean",
+                          cluster_columns = FALSE,
+                          top_annotation = topAnnotation,
+                          column_title = paste0("Heatmap of significant proteins (FDR<0.05) for ",contrast," contrast"),
+                          column_title_gp = gpar(fontsize = 20, fontface = "bold")
+    )
+    
+    print(topHeatmap)
+    
+    dev.off()
+    
+    
+  }else if (contrast == "WKY_Vs_ZSF_O"){
+    
+    requiredColumns <- grep("^wky",colnames(measurements))
+    requiredColumns <- c(requiredColumns,grep("^zsf1_ob",colnames(measurements)))
+    requiredMeasurements <- measurements[,requiredColumns]
+    
+    sampleNames <- colnames(requiredMeasurements)
+    
+    wky_SamplesCount <- length(grep(paste0("^", "wky"), sampleNames))
+    zfs1_ob_SamplesCount <- length(grep(paste0("^", "zsf1_ob"), sampleNames))
+    
+    
+    sampleGroups <- factor(c(rep("WKY",wky_SamplesCount),
+                             rep("ZSF1_OB",zfs1_ob_SamplesCount)
+    ))
+    
+    groupColors <- c("WKY" = "blue",
+                     "ZSF1_OB" = "red")
+    
+    sigProteins <- allDEProteinsSig$Protein
+    
+    sigProteinIntensityData <- requiredMeasurements[rownames(requiredMeasurements) %in% sigProteins,]
+    
+    scaledSigExpData <- t(scale(t(sigProteinIntensityData)))
+    
+    topAnnotation <- HeatmapAnnotation(
+      Group = sampleGroups,
+      col = list(Group = groupColors)
+    )
+    
+    jpeg(paste0("data/",contrast,"_TopHeatMap.jpeg"), width = 1200, height = 1000,quality = 100)
+    
+    topHeatmap <- Heatmap(scaledSigExpData,
+                          name = "Expression",
+                          row_names_side = "left",
+                          column_names_side = "top",
+                          clustering_distance_rows = "euclidean",
+                          cluster_columns = FALSE,
+                          top_annotation = topAnnotation,
+                          column_title = paste0("Heatmap of significant proteins (FDR<0.05) for ",contrast," contrast"),
+                          column_title_gp = gpar(fontsize = 20, fontface = "bold")
+    )
+    
+    print(topHeatmap)
+    
+    dev.off()
+    
+  }else if (contrast == "WKY_Vs_ZSF_L"){
+    
+    requiredColumns <- grep("^wky",colnames(measurements))
+    requiredColumns <- c(requiredColumns,grep("^ZSF1_Lean",colnames(measurements)))
+    requiredMeasurements <- measurements[,requiredColumns]
+    
+    sampleNames <- colnames(requiredMeasurements)
+    
+    wky_SamplesCount <- length(grep(paste0("^", "wky"), sampleNames))
+    zfs1_ob_SamplesCount <- length(grep(paste0("^", "ZSF1_Lean"), sampleNames))
+    
+    
+    sampleGroups <- factor(c(rep("WKY",wky_SamplesCount),
+                             rep("ZSF1_LEAN",zfs1_ob_SamplesCount)
+    ))
+    
+    groupColors <- c("WKY" = "blue",
+                     "ZSF1_LEAN" = "red")
+    
+    sigProteins <- allDEProteinsSig$Protein
+    
+    sigProteinIntensityData <- requiredMeasurements[rownames(requiredMeasurements) %in% sigProteins,]
+    
+    scaledSigExpData <- t(scale(t(sigProteinIntensityData)))
+    
+    topAnnotation <- HeatmapAnnotation(
+      Group = sampleGroups,
+      col = list(Group = groupColors)
+    )
+    
+    jpeg(paste0("data/",contrast,"_TopHeatMap.jpeg"), width = 1200, height = 1000,quality = 100)
+    
+    topHeatmap <- Heatmap(scaledSigExpData,
+                          name = "Expression",
+                          row_names_side = "left",
+                          column_names_side = "top",
+                          clustering_distance_rows = "euclidean",
+                          cluster_columns = FALSE,
+                          top_annotation = topAnnotation,
+                          column_title = paste0("Heatmap of significant proteins (FDR<0.05) for ",contrast," contrast"),
+                          column_title_gp = gpar(fontsize = 20, fontface = "bold")
+    )
+    
+    print(topHeatmap)
+    
+    dev.off()
+    
+  }
+  
+  DoEnrichRAnnotation(contrast = contrast)
   
 }
+  
 
 
 
