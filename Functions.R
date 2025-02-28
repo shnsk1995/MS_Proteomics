@@ -22,9 +22,9 @@ DoEnrichRAnnotation <- function(contrast){
       labs(x="Gene Overlap", y="Pathway", title= paste0("Pathway Enrichment Dot Plot for ",contrast," contrast")) +
       theme_minimal()
     
-    ggsave(paste0("data/",contrast,"_BarPlot.jpeg"), barPlot,dpi = 600)
+    ggsave(paste0("data/",contrast,"_BarPlot.jpeg"), barPlot,dpi = 600, width = 20)
     
-    ggsave(paste0("data/",contrast,"_DotPlot.jpeg"), dotPlot,dpi = 600)
+    ggsave(paste0("data/",contrast,"_DotPlot.jpeg"), dotPlot,dpi = 600, width = 20)
     
     
   
